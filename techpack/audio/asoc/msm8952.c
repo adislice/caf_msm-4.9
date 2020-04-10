@@ -405,7 +405,6 @@ int msm_spk_ext_pa_ctrl(struct msm_asoc_mach_data *pdatadata, bool value)
 	struct msm_asoc_mach_data *pdata = pdatadata;
 	bool on_off = !value;
 	int ret = 0;
-
 	struct sched_param param;
 	int maxpri;
 
