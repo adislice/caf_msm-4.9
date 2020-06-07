@@ -12,7 +12,8 @@
  * GNU General Public License for more details.
  */
 
-&int_codec {
+&soc {
+	int_codec: sound {
 	status = "okay";
 	/delete-property/ qcom,cdc-us-euro-gpios;
 	qcom,model = "msm8952-snd-card-mtp";
@@ -20,7 +21,7 @@
 	qcom,msm-mbhc-gnd-swh = <1>;
 	qcom,msm-hs-micbias-type = "external";
 	qcom,msm-micbias1-ext-cap;
-        qcom,msm-micbias2-ext-cap;
+	qcom,msm-micbias2-ext-cap;
 	qcom,smg3711-enable-gpio = <&tlmm 25 0>;
 	qcom,smg3711-in-gpio = <&tlmm 16 0>;
 	qcom,hdmi-dba-codec-rx;
@@ -46,7 +47,7 @@
 	/delete-property/ pinctrl-5;
 	/delete-property/ pinctrl-6;
 	/delete-property/ pinctrl-7;
-        qcom,spk_ext_pa = <&tlmm 1 0>;
+	qcom,spk_ext_pa = <&tlmm 1 0>;
 	qcom,audio-routing =
 		"RX_BIAS", "MCLK",
 		"SPK_RX_BIAS", "MCLK",
@@ -60,6 +61,11 @@
 	asoc-codec = <&stub_codec>, <&msm_digital_codec>, <&hdmi_dba>;
 	asoc-codec-names = "msm-stub-codec.1",
 			"msm-hdmi-dba-codec-rx";
+	};
+	audio_amplifier {
+		compatible = "aw,aw8738";
+		ext-spk-amp-gpio = <&tlmm 1 0>;
+	};
 };
 
 &ext_codec {
