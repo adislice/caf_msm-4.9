@@ -70,6 +70,9 @@ struct pwm_output_pattern {
 	u64 cycles_per_duty;
 };
 
+long stop_ir_pwm_data(void);
+/* pwm_enable & pwm_disable - direct write pwm register to control pwm output is enabled and disabled*/
+long qpnp_ir_pwm_data(void *arg);
 /*
  * struct pwm_state - state of a PWM channel
  * @period: PWM period (in nanoseconds)
