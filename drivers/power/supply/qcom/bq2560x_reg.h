@@ -199,7 +199,7 @@
 
 /* Register 0x08*/
 #define BQ2560X_REG_08              0x08
-#define REG08_VBUS_STAT_MASK      0xE0
+#define REG08_VBUS_STAT_MASK      0xE0           
 #define REG08_VBUS_STAT_SHIFT     5
 #define REG08_VBUS_TYPE_NONE	  0
 #define REG08_VBUS_TYPE_USB       1
@@ -303,5 +303,4 @@
 
 
 #endif
-
 

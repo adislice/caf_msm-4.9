@@ -2,7 +2,6 @@
  * BQ2560x battery charging driver
  *
  * Copyright (C) 2013 Texas Instruments
- * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This package is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -58,12 +57,12 @@ struct bq2560x_platform_data {
 	struct bq2560x_charge_param ta;
 	int iprechg;
 	int iterm;
-
+	
 	enum stat_ctrl statctrl;
-	enum vboost boostv;
-	enum iboost boosti;
+	enum vboost boostv;	// options are 4850,
+	enum iboost boosti; // options are 500mA, 1200mA
 	enum vac_ovp vac_ovp;
-
+	
 };
 
 #endif
