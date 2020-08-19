@@ -1097,13 +1097,13 @@ void pull_down_dtest1(void)
 	long rc = 0;
 
 	reg = 0xA5;
-	rc = spmi_ext_register_writel(pwm_chip->spmi_dev->ctrl, pwm_chip->spmi_dev->sid,
-									pwm_chip->lpg_config.base_addr+0xD0, &reg, 1);
+	rc = regmap_write(pwm_chip->regmap,
+									pwm_chip->lpg_config.base_addr+0xD0, reg);
 	if(rc)
 		pr_err("Failed to unlock the Secure register\n ");
 	reg = 0x1;
-	rc = spmi_ext_register_writel(pwm_chip->spmi_dev->ctrl, pwm_chip->spmi_dev->sid,
-					pwm_chip->lpg_config.base_addr+0xE2, &reg, 1);
+    rc = regmap_write(pwm_chip->regmap,
+					pwm_chip->lpg_config.base_addr+0xE2, reg);
 	if(rc)
 		pr_err("Failed to setting DTEST1 LPG_OUT_lo\n");
 }
@@ -1117,8 +1117,8 @@ long stop_ir_pwm_data(void)
 		pwm_chip->enabled = false;
 
 		reg = 0x0;
-		spmi_ext_register_writel(pwm_chip->spmi_dev->ctrl, pwm_chip->spmi_dev->sid,
-							pwm_chip->lpg_config.base_addr+0x46, &reg, 1);
+		regmap_write(pwm_chip->regmap,
+							pwm_chip->lpg_config.base_addr+0x46, reg);
 		if(rc){
 			pr_err("Failed to disable PWM output disable\n");
 			return -1;
@@ -1138,8 +1138,8 @@ long qpnp_ir_pwm_data(void *arg)
 	spin_lock_irqsave(&pwm_chip->lpg_lock, flags);
 
 	reg = 0xA5;
-	rc = spmi_ext_register_writel(pwm_chip->spmi_dev->ctrl, pwm_chip->spmi_dev->sid,
-								pwm_chip->lpg_config.base_addr+0xD0, &reg, 1);
+	rc = regmap_write(pwm_chip->regmap,
+								pwm_chip->lpg_config.base_addr+0xD0, reg);
 	if(rc){
 		pr_err("Failed to unlock the Secure register\n ");
 		goto error;
@@ -1147,8 +1147,8 @@ long qpnp_ir_pwm_data(void *arg)
 
 	if(pwm_chip->dtest_line == 1) {
 		reg = 0x1;
-		rc = spmi_ext_register_writel(pwm_chip->spmi_dev->ctrl, pwm_chip->spmi_dev->sid,
-									pwm_chip->lpg_config.base_addr+0xE2, &reg, 1);
+		rc = regmap_write(pwm_chip->regmap,
+									pwm_chip->lpg_config.base_addr+0xE2, reg);
 		if(rc){
 			pr_err("Failed to setting DTEST1 LPG_OUT_lo\n");
 			goto error;
@@ -1156,15 +1156,15 @@ long qpnp_ir_pwm_data(void *arg)
 	}
 
 	reg = 0xA8;
-	rc  = spmi_ext_register_writel(pwm_chip->spmi_dev->ctrl, pwm_chip->spmi_dev->sid,
-								   pwm_chip->lpg_config.base_addr+0x44, &reg, 1);
+	rc  = regmap_write(pwm_chip->regmap,
+								   pwm_chip->lpg_config.base_addr+0x44, reg);
 	if(rc){
 		pr_err("LSB:Failed to setting PWM duty as 0.33\n");
 	goto error;
 	}
 	reg = 0x0;
-	rc = spmi_ext_register_writel(pwm_chip->spmi_dev->ctrl, pwm_chip->spmi_dev->sid,
-								   pwm_chip->lpg_config.base_addr+0x45, &reg, 1);
+	rc = regmap_write(pwm_chip->regmap,
+								   pwm_chip->lpg_config.base_addr+0x45, reg);
 	if(rc){
 		pr_err("MSB: Failed to setting PWM duty as 0.33 \n");
 		goto error;
@@ -1175,8 +1175,8 @@ long qpnp_ir_pwm_data(void *arg)
 		if (pkt->next & 0x01)
 		{
 			reg = 0x0;
-			spmi_ext_register_writel(pwm_chip->spmi_dev->ctrl, pwm_chip->spmi_dev->sid,
-												pwm_chip->lpg_config.base_addr+0x46, &reg, 1);
+			regmap_write(pwm_chip->regmap,
+												pwm_chip->lpg_config.base_addr+0x46, reg);
 			if(rc){
 				pr_err("Failed to disable PWM output disable\n");
 				goto error;
@@ -1184,16 +1184,16 @@ long qpnp_ir_pwm_data(void *arg)
 		} else {
 
 			reg = 0x80;
-			rc = spmi_ext_register_writel(pwm_chip->spmi_dev->ctrl, pwm_chip->spmi_dev->sid,
-												pwm_chip->lpg_config.base_addr+0x46, &reg, 1);
+			rc = regmap_write(pwm_chip->regmap,
+												pwm_chip->lpg_config.base_addr+0x46, reg);
 			if(rc){
 				pr_err("Failed to Writing PWM output enable register\n");
 				goto error;
 			}
 
 			reg = 0x1;
-			rc = spmi_ext_register_writel(pwm_chip->spmi_dev->ctrl, pwm_chip->spmi_dev->sid,
-												pwm_chip->lpg_config.base_addr+0x47, &reg, 1);
+			rc = regmap_write(pwm_chip->regmap,
+												pwm_chip->lpg_config.base_addr+0x47, reg);
 			if(rc){
 				pr_err("Failed to enable PWM output\n");
 				goto error;
@@ -1206,8 +1206,8 @@ long qpnp_ir_pwm_data(void *arg)
 	}
 
 	reg = 0x0;
-	rc = spmi_ext_register_writel(pwm_chip->spmi_dev->ctrl, pwm_chip->spmi_dev->sid,
-												pwm_chip->lpg_config.base_addr+0x46, &reg, 1);
+	rc = regmap_write(pwm_chip->regmap,
+												pwm_chip->lpg_config.base_addr+0x46, reg);
 	if(rc){
 			pr_err("Failed to disable PWM output\n");
 			goto error;
