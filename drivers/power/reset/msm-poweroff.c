@@ -71,8 +71,6 @@ int download_mode = 0;
 static const int download_mode;
 #endif
 
-static int in_panic;
-
 static int panic_prep_restart(struct notifier_block *this,
 			      unsigned long event, void *ptr)
 {
