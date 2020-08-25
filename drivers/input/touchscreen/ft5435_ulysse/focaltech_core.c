@@ -47,8 +47,6 @@ struct i2c_client *fts_i2c_client;
 struct fts_ts_data *fts_wq_data;
 struct input_dev *fts_input_dev;
 
-char g_lcd_id[128] = "shenchao";
-
 #if WANGHAN_FT5435_PINCTRL
 struct pctrl_data {
 	struct pinctrl *tpctrl;
