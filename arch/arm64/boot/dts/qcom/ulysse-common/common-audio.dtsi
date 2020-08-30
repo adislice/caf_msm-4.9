@@ -14,16 +14,19 @@
 
 &int_codec {
 	status = "okay";
-	/delete-property/ qcom,cdc-us-euro-gpios;
 	qcom,model = "msm8952-snd-card-mtp";
 	qcom,msm-mbhc-hphl-swh = <1>;
 	qcom,msm-mbhc-gnd-swh = <1>;
 	qcom,msm-hs-micbias-type = "external";
 	qcom,msm-micbias1-ext-cap;
-        qcom,msm-micbias2-ext-cap;
+    qcom,msm-micbias2-ext-cap;
 	qcom,smg3711-enable-gpio = <&tlmm 25 0>;
 	qcom,smg3711-in-gpio = <&tlmm 16 0>;
 	qcom,hdmi-dba-codec-rx;
+	/delete-property/ qcom,cdc-us-euro-gpios;
+	/delete-property/ qcom,cdc-us-eu-gpios;
+	/delete-property/ qcom,pri-mi2s-gpios;
+	/delete-property/ qcom,quin-mi2s-gpios;
 
 	qcom,msm-gpios =
 		"pri_i2s",
@@ -46,7 +49,7 @@
 	/delete-property/ pinctrl-5;
 	/delete-property/ pinctrl-6;
 	/delete-property/ pinctrl-7;
-        qcom,spk_ext_pa = <&tlmm 1 0>;
+    qcom,spk_ext_pa = <&tlmm 1 0>;
 	qcom,audio-routing =
 		"RX_BIAS", "MCLK",
 		"SPK_RX_BIAS", "MCLK",
@@ -57,18 +60,6 @@
 		"AMIC1", "MIC BIAS External",
 		"AMIC2", "MIC BIAS External2",
 		"AMIC3", "MIC BIAS External";
-	asoc-codec = <&stub_codec>, <&msm_digital_codec>, <&hdmi_dba>;
-	asoc-codec-names = "msm-stub-codec.1",
-			"msm-hdmi-dba-codec-rx";
-};
-
-&ext_codec {
-	/delete-property/ qcom,pinctrl-names;
-	/delete-property/ pinctrl-names;
-	/delete-property/ pinctrl-0;
-	/delete-property/ pinctrl-1;
-	/delete-property/ pinctrl-2;
-	/delete-property/ pinctrl-3;
 };
 
 &wsa881x_i2c_f {
@@ -89,4 +80,28 @@
 
 &wsa881x_214 {
 	qcom,spkr-sd-n-gpio = <&tlmm 1 0>;
+};
+
+&cdc_us_euro_sw {
+	status = "disabled";
+};
+
+&cdc_pri_mi2s_gpios {
+	status = "disabled";
+};
+
+&cdc_quin_mi2s_gpios {
+	status = "disabled";
+};
+
+&wsa881x_analog_vi_gpio {
+	status = "disabled";
+};
+
+&wsa881x_analog_clk_gpio {
+	status = "disabled";
+};
+
+&wsa881x_analog_reset_gpio {
+	status = "disabled";
 };
