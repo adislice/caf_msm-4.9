@@ -239,15 +239,6 @@ static bool wcd_is_special_headset(struct wcd_mbhc *mbhc)
 			break;
 		}
 	}
-#ifdef CONFIG_MACH_XIAOMI_ULYSSE
-    if (mbhc->impedance_detect) {
-			mbhc->mbhc_cb->compute_impedance(mbhc,
-			&mbhc->zl, &mbhc->zr);
-			if ((mbhc->zl > 20000) && (mbhc->zr > 20000)) {
-				pr_debug("%s: Selfie stick detected\n",__func__);
-			}
-		}
-#endif
 	if (is_spl_hs) {
 		pr_debug("%s: Headset with threshold found\n",  __func__);
 		mbhc->micbias_enable = true;
@@ -449,9 +440,6 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 	struct wcd_mbhc *mbhc;
 	struct snd_soc_codec *codec;
 	enum wcd_mbhc_plug_type plug_type = MBHC_PLUG_TYPE_INVALID;
-#ifdef CONFIG_MACH_XIAOMI_ULYSSE
-	int iRetryCount;
-#endif
 	unsigned long timeout;
 	u16 hs_comp_res = 0, hphl_sch = 0, mic_sch = 0, btn_result = 0;
 	bool wrk_complete = false;
@@ -539,11 +527,7 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 correct_plug_type:
 
 	timeout = jiffies + msecs_to_jiffies(HS_DETECT_PLUG_TIME_MS);
-#ifdef CONFIG_MACH_XIAOMI_ULYSSE
-	for(iRetryCount = 0; iRetryCount < 5; iRetryCount++) {
-#else
 	while (!time_after(jiffies, timeout)) {
-#endif
 		if (mbhc->hs_detect_work_stop) {
 			pr_debug("%s: stop requested: %d\n", __func__,
 					mbhc->hs_detect_work_stop);
@@ -753,21 +737,7 @@ enable_supply:
 	if (mbhc->mbhc_cb->mbhc_micbias_control)
 		wcd_mbhc_update_fsm_source(mbhc, plug_type);
 	else
-#ifdef CONFIG_MACH_XIAOMI_ULYSSE
-	{
-		if (mbhc->impedance_detect) {
-			mbhc->mbhc_cb->compute_impedance(mbhc,
-			&mbhc->zl, &mbhc->zr);
-				if ((mbhc->zl > 20000) && (mbhc->zr > 20000)) {
-					pr_debug("%s:Selfie stick device,need enable btn isrc ctrl",__func__);
-					wcd_enable_mbhc_supply(mbhc, MBHC_PLUG_TYPE_HEADSET);
-				}
-		}
-#endif
 		wcd_enable_mbhc_supply(mbhc, plug_type);
-#ifdef CONFIG_MACH_XIAOMI_ULYSSE
-	}
-#endif
 exit:
 	if (mbhc->mbhc_cb->mbhc_micbias_control &&
 	    !mbhc->micbias_enable)
