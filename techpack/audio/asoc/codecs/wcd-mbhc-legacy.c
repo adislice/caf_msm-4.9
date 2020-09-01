@@ -245,7 +245,6 @@ static bool wcd_is_special_headset(struct wcd_mbhc *mbhc)
 			&mbhc->zl, &mbhc->zr);
 			if ((mbhc->zl > 20000) && (mbhc->zr > 20000)) {
 				pr_debug("%s: Selfie stick detected\n",__func__);
-				break;
 			}
 		}
 #endif

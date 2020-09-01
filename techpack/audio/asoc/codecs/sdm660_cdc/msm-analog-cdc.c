@@ -102,7 +102,7 @@ static char on_demand_supply_name[][MAX_ON_DEMAND_SUPPLY_NAME_LENGTH] = {
 static int external_spk_control = 1;
 static int external_hs_control = 0;
 
-int smg_in_gpio = 1;
+int smg_in_gpio1 = 1;
 #endif
 
 static struct wcd_mbhc_register
@@ -1940,7 +1940,7 @@ static int set_external_hp_analog_switch(struct snd_kcontrol *kcontrol,
 					   struct snd_ctl_elem_value *ucontrol)
 {
 	bool hp_analog_control = ucontrol->value.integer.value[0];
-	gpio_set_value(smg_in_gpio,!hp_analog_control);
+	gpio_set_value(smg_in_gpio1,!hp_analog_control);
 	return 0;
 }
 #endif
