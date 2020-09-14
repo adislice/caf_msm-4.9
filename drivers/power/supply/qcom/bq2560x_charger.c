@@ -1011,6 +1011,15 @@ static int bq2560x_charger_get_property(struct power_supply *psy,
 
 static int bq2560x_system_temp_level_set(struct bq2560x *bq, int);
 
+static char *bq_charger_supplied_to[] = {
+	"bms",
+};
+
+static char *bq_usb_supplicants[] = {
+	"battery",
+	"bms",
+};
+
 static enum power_supply_property bq2560x_usb_properties[] = {
 	POWER_SUPPLY_PROP_PRESENT,
 	POWER_SUPPLY_PROP_ONLINE,
@@ -1165,7 +1174,7 @@ static int bq2560x_update_charging_profile(struct bq2560x *bq)
 		chg_mv = bq->jeita_mv;
 	} else {
 		if (bq->usb_supply_type == POWER_SUPPLY_TYPE_USB_DCP
-			|| prop.intval == POWER_SUPPLY_TYPE_USB_CDP) {
+			|| bq->usb_supply_type == POWER_SUPPLY_TYPE_USB_CDP) {
 
 			chg_ma = bq->platform_data->ta.ichg;
 			chg_mv = bq->platform_data->ta.vreg;
@@ -1226,9 +1235,6 @@ static int bq2560x_system_temp_level_set(struct bq2560x *bq,
 	int ret = 0;
 	int prev_therm_lvl;
 
-	ret = bq2560x_update_charging_profile(bq);
-	if (ret)
-		pr_err("Couldn't set USB current ret = %d\n", ret);
 
 	pr_err("lvl_sel=%d, bq->therm_lvl_sel = %d\n", lvl_sel, bq->therm_lvl_sel);
 	if (BatteryTestStatus_enable)
@@ -1297,6 +1303,8 @@ static void bq2560x_external_power_changed(struct power_supply *psy)
 		bq2560x_update_charging_profile(bq);
 	}
 
+	bq2560x_update_charging_profile(bq);
+
 	ret = power_supply_get_property(bq->usb_psy, 
 				POWER_SUPPLY_PROP_ONLINE, &prop);
 	if (ret < 0)
@@ -1339,7 +1347,8 @@ static int bq2560x_psy_register(struct bq2560x *bq)
 	bq->batt_psy_d.property_is_writeable = bq2560x_charger_is_writeable;
 
 	batt_psy_cfg.drv_data = bq;
-	batt_psy_cfg.num_supplicants = 0;
+	batt_psy_cfg.supplied_to = bq_charger_supplied_to;
+	batt_psy_cfg.num_supplicants = ARRAY_SIZE(bq_charger_supplied_to);
 
 	bq->batt_psy = devm_power_supply_register(bq->dev,
 			&bq->batt_psy_d,
@@ -2005,9 +2014,6 @@ static void bq2560x_dump_status(struct bq2560x* bq)
 			pr_err("bq Reg red err\n");
 	}
 
-	ret = bq2560x_update_charging_profile(bq);
-	if (ret)
-		pr_err("Couldn't set USB current ret = %d\n", ret);
 
 	if (!bq->power_good)
 		pr_info("Power Poor\n");
@@ -2527,8 +2533,11 @@ static int bq2560x_charger_probe(struct i2c_client *client,
 	bq->usb_psy_desc.properties = bq2560x_usb_properties;
 	bq->usb_psy_desc.num_properties = ARRAY_SIZE(bq2560x_usb_properties);
 	bq->usb_psy_desc.property_is_writeable = bq2560x_usb_is_writeable;
+
 	usb_psy_cfg.drv_data = bq;
-	usb_psy_cfg.num_supplicants = 0;
+	usb_psy_cfg.supplied_to = bq_usb_supplicants;
+	usb_psy_cfg.num_supplicants = ARRAY_SIZE(bq_usb_supplicants);
+
 	bq->usb_psy = devm_power_supply_register(bq->dev, &bq->usb_psy_desc, &usb_psy_cfg);
 	
 	if(IS_ERR(bq->usb_psy)){
