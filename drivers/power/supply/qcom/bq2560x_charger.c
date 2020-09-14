@@ -1164,20 +1164,16 @@ static int bq2560x_update_charging_profile(struct bq2560x *bq)
 		chg_ma = bq->jeita_ma;
 		chg_mv = bq->jeita_mv;
 	} else {
-		if (bq->usb_supply_type == POWER_SUPPLY_TYPE_USB_DCP
+		if (prop.intval == POWER_SUPPLY_TYPE_USB_DCP
 			|| prop.intval == POWER_SUPPLY_TYPE_USB_CDP) {
-
 			chg_ma = bq->platform_data->ta.ichg;
 			chg_mv = bq->platform_data->ta.vreg;
-			pr_err("DCP or CDP detected, set max current to : %d, max voltage to : %d\n", chg_ma,chg_mv);
 		} else {
 			chg_ma = bq->platform_data->usb.ichg;
 			chg_mv = bq->platform_data->usb.vreg;
-			pr_err("USB detected, set max current to : %d, max voltage to : %d\n", chg_ma,chg_mv);
-
 		}
 	}
-
+	
 	icl = bq->usb_psy_ma;
 	if (bq->usb_psy_ma < chg_ma) {
 		chg_ma = bq->usb_psy_ma;
@@ -1225,10 +1221,6 @@ static int bq2560x_system_temp_level_set(struct bq2560x *bq,
 {
 	int ret = 0;
 	int prev_therm_lvl;
-
-	ret = bq2560x_update_charging_profile(bq);
-	if (ret)
-		pr_err("Couldn't set USB current ret = %d\n", ret);
 
 	pr_err("lvl_sel=%d, bq->therm_lvl_sel = %d\n", lvl_sel, bq->therm_lvl_sel);
 	if (BatteryTestStatus_enable)
@@ -2005,9 +1997,8 @@ static void bq2560x_dump_status(struct bq2560x* bq)
 			pr_err("bq Reg red err\n");
 	}
 
-	ret = bq2560x_update_charging_profile(bq);
-	if (ret)
-		pr_err("Couldn't set USB current ret = %d\n", ret);
+	
+
 
 	if (!bq->power_good)
 		pr_info("Power Poor\n");
