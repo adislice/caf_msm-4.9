@@ -251,8 +251,9 @@ struct bq_fg_chip {
 
 	struct dentry *debug_root;
 
-	struct power_supply *fg_psy;
+	struct power_supply fg_psy;
 	struct power_supply_desc fg_psy_desc;
+
 
 	struct qpnp_vadc_chip	*vadc_dev;
 	struct regulator		*vdd;
@@ -1161,7 +1162,7 @@ static enum power_supply_property fg_props[] = {
 static int fg_get_property(struct power_supply *psy, enum power_supply_property psp,
 					union power_supply_propval *val)
 {
-	struct bq_fg_chip *bq = power_supply_get_drvdata(psy);
+	struct bq_fg_chip *bq = container_of(psy, struct bq_fg_chip, fg_psy);
 	int ret;
 
 	mutex_lock(&bq->update_lock);
@@ -1284,15 +1285,15 @@ static int fg_set_property(struct power_supply *psy,
 				       enum power_supply_property prop,
 				       const union power_supply_propval *val)
 {
-	struct bq_fg_chip *bq = power_supply_get_drvdata(psy);
-
+	struct bq_fg_chip *bq = container_of(psy, struct bq_fg_chip,
+									fg_psy);
 	switch (prop) {
 	case POWER_SUPPLY_PROP_TEMP:
 		bq->fake_temp = val->intval;
 		break;
 	case POWER_SUPPLY_PROP_CAPACITY:
 		bq->fake_soc = val->intval;
-		power_supply_changed(bq->fg_psy);
+		power_supply_changed(&bq->fg_psy);
 		break;
 	case POWER_SUPPLY_PROP_UPDATE_NOW:
 		fg_dump_registers(bq);
@@ -1338,7 +1339,7 @@ static void fg_external_power_changed(struct power_supply *psy)
 
 static int fg_psy_register(struct bq_fg_chip *bq)
 {
-	struct power_supply_config fg_psy_cfg = {};
+	int ret;
 
 	bq->fg_psy_desc.name = "bms";
 	bq->fg_psy_desc.type = POWER_SUPPLY_TYPE_BMS;
@@ -1349,14 +1350,11 @@ static int fg_psy_register(struct bq_fg_chip *bq)
 	bq->fg_psy_desc.external_power_changed = fg_external_power_changed;
 	bq->fg_psy_desc.property_is_writeable = fg_prop_is_writeable;
 
-	fg_psy_cfg.drv_data = bq;
-	fg_psy_cfg.num_supplicants = 0;
-	bq->fg_psy = devm_power_supply_register(bq->dev,
-						&bq->fg_psy_desc,
-						&fg_psy_cfg);
-	if (IS_ERR(bq->fg_psy)) {
-		pr_err("Failed to register fg_psy");
-		return PTR_ERR(bq->fg_psy);
+
+	ret = power_supply_register(bq->dev, &bq->fg_psy, &bq->fg_psy_desc);
+	if (ret < 0) {
+		pr_err("Failed to register fg_psy:%d\n", ret);
+		return ret;
 	}
 
 	return 0;
@@ -1366,7 +1364,7 @@ static int fg_psy_register(struct bq_fg_chip *bq)
 static void fg_psy_unregister(struct bq_fg_chip *bq)
 {
 
-	power_supply_unregister(bq->fg_psy);
+	power_supply_unregister(&bq->fg_psy);
 }
 
 
@@ -1838,7 +1836,7 @@ static irqreturn_t fg_irq_thread(int irq, void *dev_id)
 			bq->batt_soc, bq->batt_volt, bq->batt_curr, bq->batt_temp - 2730, bq->connected_rid);
 	}
 
-	power_supply_changed(bq->fg_psy);
+	power_supply_changed(&bq->fg_psy);
 	mutex_unlock(&bq->irq_complete);
 
 	return IRQ_HANDLED;
@@ -2147,7 +2145,7 @@ static int bq_fg_resume(struct device *dev)
 		mutex_unlock(&bq->irq_complete);
 	}
 
-	power_supply_changed(bq->fg_psy);
+	power_supply_changed(&bq->fg_psy);
 
 	return 0;
 
