@@ -122,7 +122,11 @@ enum msm_usb_phy_type {
 #define IDEV_CHG_MAX	2000
 #endif
 #define IUNIT		100
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+#define IDEV_HVDCP_CHG_MAX 2000
+#else
 #define IDEV_HVDCP_CHG_MAX	1800
+#endif
 
 /**
  * Used different VDDCX voltage values
